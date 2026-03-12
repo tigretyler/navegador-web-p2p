@@ -4,9 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P2P Web Interface</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+        #message-input { width: 80%; }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the P2P Web Interface</h1>
-    <p>This is a simple peer-to-peer web interface.</p>
+    <h1>P2P Web Interface</h1>
+    <div id="messages"></div>
+    <input id="message-input" type="text" placeholder="Type your message here..." />
+    <button id="send-button">Send</button>
+    <script>
+        const socket = io.connect('http://localhost:3000');
+        const messagesDiv = document.getElementById('messages');
+        const input = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+
+        sendButton.onclick = () => {
+            const message = input.value;
+            socket.emit('chat message', message);
+            input.value = '';
+        };
+
+        socket.on('chat message', (msg) => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = msg;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+    </script>
 </body>
 </html>
